@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase CRUD</title>
+
+  <!-- BOOTSWATCH -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.0/pulse/bootstrap.min.css">
+
+  <!-- ANIMATE CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+
+</head>
+
+<body class="bg-light">
+
+  <!-- ADD CONCIERTO -->
+  <div class="container p-4">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body">
+
+            <h1 class="h4">Adicionar concierto</h1>
+
+            <form id="concierto-form">
+              <div class="form-group">
+                <input type="text" id="concierto-nombre" class="form-control" placeholder="Nombre del concierto"
+                  autofocus>
+              </div>
+
+              <div class="form-group">
+                <textarea id="concierto-descripcion" rows="3" class="form-control" placeholder="Descripción del concierto"></textarea>
+              </div>
+
+              <div class="form-group">
+                <input type="text" id="concierto-url" class="form-control" placeholder="URL del concierto"
+                  autofocus>
+              </div>
+
+              <div class="form-group">
+                <input type="file" id="concierto-foto" class="form-control" placeholder="Foto publicitaria"
+                  autofocus>
+              </div>
+
+              <button class="btn btn-primary" id="btn-concierto-form">
+                Guardar concierto
+              </button>
+
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Conciertos List -->
+      <div class="col-md-6" id="conciertos-container"/>
+      
+    </div>
+  </div>
+
+  <!-- FIREBASE CONFIG -->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-firestore.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyA5zUawCMkJy4O39XbzA_NoT7EyorcNW-8",
+      authDomain: "eafit-227c4.firebaseapp.com",
+      databaseURL: "https://eafit-227c4-default-rtdb.firebaseio.com",
+      projectId: "eafit-227c4",
+      storageBucket: "eafit-227c4.appspot.com",
+      messagingSenderId: "225161412722",
+      appId: "1:225161412722:web:17d5aff17f6e06bce142eb"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <!-- CUSTOM CODE -->
+  <script src="index.js"></script>
+</body>
+
+</html>
