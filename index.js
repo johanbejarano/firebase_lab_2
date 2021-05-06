@@ -1,3 +1,5 @@
+//Referencia a la BD de firestore
+const db = firebase.firestore();
 
 const conciertoForm = document.getElementById("concierto-form");
 const conciertosContainer = document.getElementById("conciertos-container");
@@ -9,6 +11,13 @@ let id = '';
 const guardarConcierto = (nombre, descripcion, url, foto) => {
     console.log(`Guardando el concierto con los siguientes datos:
         ${nombre} ${descripcion} ${url} ${foto}`);
+
+    //Se guarda el documento en firestore
+    db.collection('conciertos').doc().set({
+        nombre: nombre,
+        descripcion: descripcion,
+        url: url
+    });
 }
 
 //Read
@@ -32,41 +41,61 @@ const eliminarConcierto = (id) => {
     console.log(`Eliminando el concierto ${id}`);
 }
 
-listenerLectorDeConciertos = (funcionCallback) => {
+const listenerLectorDeConciertos = (funcionCallback) => {
     //Escuchar cuando un concierto nuevo se registre
+    db.collection('conciertos').onSnapshot(funcionCallback);
 };
 
 
 //Cuando se cargue la página (HTML DOM)
 window.addEventListener("DOMContentLoaded", async (e) => {
     //Se registra un listener de conciertos
-    
-    //Se cuando reporte un nuevo concierto, se agrega a la lista
-    //Ejemplo:
-    let nombreConcierto = 'Guayacán';
-    let descripcionConcierto = 'Concierto en vivo de Guayacán';
-    let urlConcierto = 'https://www.youtube.com/watch?v=XJ1zqHE3pRQ';
+    listenerLectorDeConciertos((querySnapshot) => {
 
-    conciertosContainer.innerHTML += `<div class="row">
-        <div class="card card-body mt-2 border-primary col-6">
-            <h3 class="h5">${nombreConcierto}</h3>
-            <p>${descripcionConcierto}</p>
+        //Borra la lista de ocnciertos de la pantalla
+        conciertosContainer.innerHTML = "";
+        
+        //Por cada documento, haga
+        querySnapshot.forEach((doc) => {
+            //Se obtiene el documento del concierto
+
+            const concierto = doc.data();
             
-            <div>
-                <button class="btn btn-primary btn-delete" data-id="1">
-                    🗑 Borrar
-                </button>
-                <button class="btn btn-secondary btn-edit" data-id="2">
-                    🖉 Editar
-                </button>
-            </div>
-        </div>
+            //Ese concierto se muestra en la pantalla
+            let nombreConcierto = concierto.nombre;
+            let descripcionConcierto = concierto.descripcion;
+            let urlConcierto = concierto.url;
 
-        <div class="card card-body mt-2 border-primary col-6">
-            <h3 class="h5">Imagen</h3>
-            <img src="https://cr00.epimg.net/programa/imagenes/2018/04/10/top_caracol/1523311540_877253_1523316535_noticia_normal.jpg" width="200px"/>
-        </div>
-    </div>`;
+            conciertosContainer.innerHTML += `<div class="row">
+                <div class="card card-body mt-2 border-primary col-6">
+                    <h3 class="h5">${nombreConcierto}</h3>
+                    <p>${descripcionConcierto}</p>
+                    
+                    <div>
+                        <button class="btn btn-primary btn-delete" data-id="1">
+                            🗑 Borrar
+                        </button>
+                        <button class="btn btn-secondary btn-edit" data-id="2">
+                            🖉 Editar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card card-body mt-2 border-primary col-6">
+                    <h3 class="h5">Imagen</h3>
+                    <img src="${urlConcierto}" width="200px"/>
+                </div>
+            </div>`;
+
+
+        });
+
+    });
+    
+    
+    
+
+    
 
 
 });
