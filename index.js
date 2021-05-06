@@ -33,9 +33,11 @@ const concultarConciertos = () => {
 }
 
 //Update
-const actualizarConcierto = (id, nuevoConcierto) => {
+const actualizarConcierto = (id, conciertoActualizado) => {
     console.log(`Actualizando el concierto: ${id}
-        con los siguientes datos: ${nuevoConcierto}`);
+        con los siguientes datos: ${conciertoActualizado}`);
+
+        db.collection('conciertos').doc(id).update(conciertoActualizado);
 }
 
 //Delete
