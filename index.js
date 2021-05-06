@@ -43,6 +43,9 @@ const actualizarConcierto = (id, conciertoActualizado) => {
 //Delete
 const eliminarConcierto = (id) => {
     console.log(`Eliminando el concierto ${id}`);
+
+    db.collection('conciertos').doc(id).delete();
+
 }
 
 const listenerLectorDeConciertos = (funcionCallback) => {
@@ -124,6 +127,23 @@ window.addEventListener("DOMContentLoaded", async (e) => {
                 }
             });
 
+        });
+
+
+        //Se registra un listener de click en todos los botones "delete"
+        const botonesDelete = conciertosContainer.querySelectorAll(".btn-delete");
+
+        botonesDelete.forEach((btn) => {
+            btn.addEventListener("click", async (evento) => {
+                const idConciertoABorrar = evento.target.dataset.id;
+                console.log(`Borrando el concierto ${idConciertoABorrar}`);
+
+                try {
+                    await eliminarConcierto(idConciertoABorrar);
+                } catch (error) {
+                    console.log(error);
+                }
+            });
         });
 
     });
