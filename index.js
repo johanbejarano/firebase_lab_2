@@ -1,6 +1,9 @@
 //Referencia a la BD de firestore
 const db = firebase.firestore();
 
+//Referencia a storage
+const storage = firebase.storage();
+
 const conciertoForm = document.getElementById("concierto-form");
 const conciertosContainer = document.getElementById("conciertos-container");
 
@@ -8,16 +11,47 @@ let editStatus = false;
 let id = '';
 
 //Create
-const guardarConcierto = (nombre, descripcion, url, foto) => {
+const guardarConcierto = async (nombre, descripcion, foto) => {
     console.log(`Guardando el concierto con los siguientes datos:
-        ${nombre} ${descripcion} ${url} ${foto}`);
+        ${nombre} ${descripcion} ${foto}`);
 
-    //Se guarda el documento en firestore
-    db.collection('conciertos').doc().set({
-        nombre: nombre,
-        descripcion: descripcion,
-        url: url
-    });
+    //Se guarda la foto del concierto
+    const respuestaUpload = await guardarFotoDeConcierto(foto);
+    
+    //Se obtiene la URL de la foto cargada
+    respuestaUpload.ref.getDownloadURL()
+        .then(urlFotoCargada => {
+            
+            //Se guarda el documento en firestore
+            db.collection('conciertos').doc().set({
+                nombre: nombre,
+                descripcion: descripcion,
+                url: urlFotoCargada
+            });
+
+        });
+
+    
+}
+
+const guardarFotoDeConcierto = (file) => {
+    try {
+        const storageRef = storage.ref();
+
+        //Nombre del archivo en el bucket
+        const nombreArchivo = new Date() + "-" + file.name;
+
+        //Metadata que define el archivo en el bucket
+        const metadata = {
+            contenType: file.type
+        }
+
+        //Se sube el archivo y se retorna la tarea 
+        return storageRef.child(nombreArchivo).put(file, metadata);
+
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 //Read
@@ -50,7 +84,9 @@ const eliminarConcierto = (id) => {
 
 const listenerLectorDeConciertos = (funcionCallback) => {
     //Escuchar cuando un concierto nuevo se registre
-    db.collection('conciertos').onSnapshot(funcionCallback);
+    db.collection('conciertos')
+        .orderBy('nombre')
+        .onSnapshot(funcionCallback);
 };
 
 
@@ -115,7 +151,6 @@ window.addEventListener("DOMContentLoaded", async (e) => {
                     //Se escriben los datos del concierto
                     conciertoForm["concierto-nombre"].value = concierto.nombre;
                     conciertoForm["concierto-descripcion"].value = concierto.descripcion;
-                    conciertoForm["concierto-url"].value = concierto.url;
 
                     //Se cambia al estado de edición
                     editStatus = true;
@@ -165,7 +200,6 @@ conciertoForm.addEventListener("submit", async (e) => {
     //Se leen los atributos del concierto
     const txtNombreConcierto = conciertoForm["concierto-nombre"];
     const txtDescripcionConcierto = conciertoForm["concierto-descripcion"];
-    const txtUrl = conciertoForm["concierto-url"];
     const txtFoto = conciertoForm["concierto-foto"];
 
     try {
@@ -174,7 +208,6 @@ conciertoForm.addEventListener("submit", async (e) => {
             await guardarConcierto(
                 txtNombreConcierto.value,
                 txtDescripcionConcierto.value,
-                txtUrl.value,
                 txtFoto.files[0]
                 )
            
@@ -182,8 +215,7 @@ conciertoForm.addEventListener("submit", async (e) => {
             //Se quiere actualizar un concierto
             await actualizarConcierto(id, {
                 nombre: txtNombreConcierto.value,
-                descripcion: txtDescripcionConcierto.value,
-                url: txtUrl.value
+                descripcion: txtDescripcionConcierto.value
             })
 
             editStatus = false;
